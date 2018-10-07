@@ -1,31 +1,22 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using RealEstate.Properties;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using RealEstate.App_Start;
 using System.Web.Mvc;
 
 namespace RealEstate.Controllers
 {
     public class HomeController : Controller
     {
-        private IMongoDatabase database;
 
-        public HomeController()
-        {
-            var client = new MongoClient(Settings.Default.RealEstateConnectionString);
-            database = client.GetDatabase(Settings.Default.RealEstateDatabaseName);
-        }
+        private RealEstateContext _context = new RealEstateContext();
 
         public ActionResult Index()
         {
             var dbStatsCommand = new CommandDocument("dbStats", 1);
-            var dbStatsResult = database.RunCommand<BsonDocument>(dbStatsCommand);
+            var dbStatsResult = _context.Database.RunCommand<BsonDocument>(dbStatsCommand);
 
             var buildInfoCommand = new CommandDocument("buildinfo", 1);
-            var result = database.RunCommand<BsonDocument>(buildInfoCommand);
+            var result = _context.Database.RunCommand<BsonDocument>(buildInfoCommand);
             return Json(result.ToJson(), JsonRequestBehavior.AllowGet);
         }
 
