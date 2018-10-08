@@ -26,7 +26,7 @@ namespace RealEstate.Tests
             [BsonElement("New")]
             public string Old { get; set; }
             [BsonElement]
-            private string _encapsulated;
+            private readonly string _encapsulated;
         }
 
         public class Contact

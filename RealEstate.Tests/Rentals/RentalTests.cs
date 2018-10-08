@@ -1,11 +1,12 @@
 ﻿using MongoDB.Bson;
 using NUnit.Framework;
 using RealEstate.Rentals;
+using Shouldly;
 
 namespace RealEstate.Tests.Rentals
 {
     [TestFixture]
-    public class RentalTests : AssertionHelper
+    public class RentalTests
     {
         [Test]
         public void ToDocument_RentalWithPrice_PriceRepresentedAsDouble()
@@ -15,7 +16,7 @@ namespace RealEstate.Tests.Rentals
 
             var document = rental.ToBsonDocument();
 
-            Expect(document["Price"].BsonType, Is.EqualTo(BsonType.Double));
+            document["Price"].BsonType.ShouldBe(BsonType.Double);
         }
 
         [Test]
@@ -26,7 +27,7 @@ namespace RealEstate.Tests.Rentals
 
             var document = rental.ToBsonDocument();
 
-            Expect(document["_id"].BsonType, Is.EqualTo(BsonType.ObjectId));
+            document["_id"].BsonType.ShouldBe(BsonType.ObjectId);
         }
     }
 }

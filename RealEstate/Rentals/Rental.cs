@@ -15,6 +15,26 @@ namespace RealEstate.Rentals
         public int NumberOfRooms { get; set; }
         public List<string> Address { get; set; } = new List<string>();
         [BsonRepresentation(BsonType.Double)]
-        public decimal Price { get; set; } 
+        public decimal Price { get; set; }
+        public List<PriceAdjustment> Adjustments { get; set; } = new List<PriceAdjustment>();
+
+        public Rental()
+        {
+        }
+
+        public Rental(PostRental postRental)
+        {
+            Description = postRental.Description;
+            NumberOfRooms = postRental.NumberOfRooms;
+            Price = postRental.Price;
+            Address = (postRental.Address ?? string.Empty).Split('\n').ToList();
+        }
+
+        public void AdjustPrice(AdjustPrice adjustPrice)
+        {
+            var adjustment = new PriceAdjustment(adjustPrice, Price);
+            Adjustments.Add(adjustment);
+            Price = adjustPrice.NewPrice;
+        }
     }
 }

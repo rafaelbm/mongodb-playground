@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using RealEstate.Properties;
+using RealEstate.Rentals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,14 @@ namespace RealEstate.App_Start
         {
             var client = new MongoClient(Settings.Default.RealEstateConnectionString);
             Database = client.GetDatabase(Settings.Default.RealEstateDatabaseName);
+        }
+
+        public IMongoCollection<Rental> Rentals
+        {
+            get
+            {
+                return Database.GetCollection<Rental>("rentals");
+            }
         }
     }
 }
