@@ -1,8 +1,10 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using RealEstate.App_Start;
 using RealEstate.Rentals;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace RealEstate.Controllers
@@ -24,11 +26,20 @@ namespace RealEstate.Controllers
 
         private List<Rental> FilterRentals(RentalsFilter filters)
         {
-            if (!filters.PriceLimit.HasValue)
+            IQueryable<Rental> rentals = _context.Rentals.AsQueryable()
+                .OrderBy(x => x.Price);
+
+            if (filters.MinimumRooms.HasValue)
             {
-                return _context.Rentals.Find(_ => true).ToList();
+                rentals = rentals.Where(x => x.NumberOfRooms >= filters.MinimumRooms);
             }
-            return _context.Rentals.Find(x => x.Price <= filters.PriceLimit).ToList();
+
+            if (filters.PriceLimit.HasValue)
+            {
+                rentals = rentals.Where(x => x.Price <= filters.PriceLimit);
+            }
+
+            return rentals.ToList();
         }
 
         public ActionResult Post()
@@ -68,6 +79,13 @@ namespace RealEstate.Controllers
             _context.Rentals.DeleteOne(x => x.Id == id);
             return RedirectToAction("Index");
 
+        }
+
+        public string PriceDistribution()
+        {
+            return new QueryPriceDistribuition()
+                 .Run(_context.Rentals)
+                 .ToJson();
         }
 
         private Rental GetRental(string id)
