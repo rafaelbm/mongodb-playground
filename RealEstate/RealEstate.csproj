@@ -59,6 +59,9 @@
     <Reference Include="MongoDB.Driver.Core, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MongoDB.Driver.Core.2.7.0\lib\net45\MongoDB.Driver.Core.dll</HintPath>
     </Reference>
+    <Reference Include="MongoDB.Driver.GridFS, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Driver.GridFS.2.7.0\lib\net45\MongoDB.Driver.GridFS.dll</HintPath>
+    </Reference>
     <Reference Include="MongoDB.Driver.Legacy, Version=2.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\mongocsharpdriver.2.7.0\lib\net45\MongoDB.Driver.Legacy.dll</HintPath>
     </Reference>
@@ -235,6 +238,7 @@
     <Content Include="Views\Rentals\Post.cshtml" />
     <Content Include="Views\Rentals\Index.cshtml" />
     <Content Include="Views\Rentals\AdjustPrice.cshtml" />
+    <Content Include="Views\Rentals\AttachImage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
