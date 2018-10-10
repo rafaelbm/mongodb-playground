@@ -1,10 +1,14 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using MongoDB.Driver.Linq;
 using RealEstate.App_Start;
 using RealEstate.Rentals;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 
 namespace RealEstate.Controllers
@@ -88,11 +92,68 @@ namespace RealEstate.Controllers
                  .ToJson();
         }
 
+        public ActionResult AttachImage(string id)
+        {
+            var rental = GetRental(id);
+            return View(rental);
+        }
+
+        [HttpPost]
+        public ActionResult AttachImage(string id, HttpPostedFileBase file)
+        {
+            var rental = GetRental(id);
+
+            if (rental.HasImage())
+            {
+                DeleteImage(rental);
+            }
+
+            StoreImage(file, rental);
+
+            return RedirectToAction("Index");
+        }
+
+        private void DeleteImage(Rental rental)
+        {
+            _context.ImagesBucket.DeleteAsync(ObjectId.Parse(rental.ImageId));
+            SetRentalImageId(rental.Id, null);
+        }
+
+        private void StoreImage(HttpPostedFileBase file, Rental rental)
+        {
+            GridFSUploadOptions options = new GridFSUploadOptions
+            {
+                Metadata = new BsonDocument("contentType", file.ContentType)
+            };
+
+            var imageId = _context.ImagesBucket.UploadFromStream(file.FileName, file.InputStream, options);
+            SetRentalImageId(rental.Id, imageId.ToString());
+        }
+
+        public ActionResult GetImage(string id)
+        {
+            try
+            {
+                var stream = _context.ImagesBucket.OpenDownloadStream(ObjectId.Parse(id));
+                var contentType = stream.FileInfo.Metadata["contentType"].AsString;
+                return File(stream, contentType);
+            }
+            catch (GridFSFileNotFoundException)
+            {
+                return HttpNotFound();
+            }
+        }
+
+        private void SetRentalImageId(string rentalId, string imageId)
+        {
+            var setRentalImageId = Builders<Rental>.Update.Set(r => r.ImageId, imageId);
+            _context.Rentals.UpdateOne(r => r.Id == rentalId, setRentalImageId);
+        }
+
         private Rental GetRental(string id)
         {
             var filterId = Builders<Rental>.Filter.Eq("_id", ObjectId.Parse(id));
             return _context.Rentals.Find(filterId).FirstOrDefault();
         }
-
     }
 }
